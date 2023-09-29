@@ -6,7 +6,6 @@ import Menu from "./pages/menu"
 import Cart from "./pages/cart"
 import SignUp from "./pages/signup"
 import Login from "./pages/login"
-import ProductDetail from "./pages/ProductDetails"
 import NotFound from "./pages/notFound"
 
 function App() {
@@ -21,7 +20,6 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/menu" element={<Menu />} />
-          <Route path="/productDetail" element={<ProductDetail />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

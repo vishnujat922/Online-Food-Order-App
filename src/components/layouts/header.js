@@ -106,7 +106,6 @@ const Header = () => {
                 <li>
                   <a href={"/Cart"}>Cart</a>
                 </li>
-
               </ul>
             </Box>
           </Toolbar>

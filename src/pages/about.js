@@ -28,7 +28,8 @@ const About = () => {
           },
         }}
       >
-        <Typography variant="h4"> Wel Come To My Food Order App</Typography>
+        <Typography variant="h4" sx={{color:'#621940'}}> Wel Come To My Food Order App</Typography>
+        <Typography sx={{color:'#621940'}}>
         <p>
         Indian food is different from rest of the world not only in taste but also in cooking methods. It reflects a perfect blend of various cultures and ages. Just like Indian culture, food in India has also been influenced by various civilizations, which have contributed their share in its overall development and the present form.
         </p>
@@ -51,9 +52,9 @@ const About = () => {
         <p>
         Food in the north India, to begin with, Kashmiri cuisines reflect strong Central Asian influences. In Kashmir, mostly all the dishes are prepared around the main course of rice found abundantly in the beautiful valley. Another delicious item cooked here is the ‘Saag‘ that is prepared with a green leafy vegetable known as the ‘Hak‘.
         </p>
+        </Typography>
       </Box>
     </Layout>
   );
 };
-
 export default About;

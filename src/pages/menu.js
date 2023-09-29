@@ -1,83 +1,186 @@
-import { MenuList } from "../data/data";
-import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-import TrendingUpIcon from "@mui/icons-material/TrendingUp";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Button,
   Card,
   CardActionArea,
-  CardContent,
   CardMedia,
-  Typography,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  TextField,
 } from "@mui/material";
 import Layout from "../components/layouts/layouts";
-import { Link } from "react-router-dom";
-import { useState } from "react";
-import ProductDetails from "./ProductDetails";
 
 const Menu = () => {
-  const [showDetails, setShowDetails] = useState(false);
-  const product = {
-    name: "Product Name",
-    price: "$10.99",
-    quantity: 5
+  const [data, setData] = useState([]);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [quantity, setQuantity] = useState(1);
+
+  const handleBuyClick = (item) => {
+    setSelectedProduct(item);
+    // Reset quantity to 1 when a new product is selected
+    setQuantity(1);
   };
 
-  const handleBuyClick = () => {
-    console.log("Buy button clicked");
-    alert('Buy button clicked')
-    setShowDetails(true);
+  const handleCloseModal = () => {
+    setSelectedProduct(null);
   };
-  
+
+  const handleQuantityChange = (event) => {
+    const newQuantity = parseInt(event.target.value, 10);
+    if (!isNaN(newQuantity) && newQuantity >= 1) {
+      setQuantity(newQuantity);
+    }
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await fetch("https://dummyjson.com/products", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          console.log("data", data);
+          setData(data.products);
+        } else {
+          console.error("Failed to fetch data");
+        }
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   return (
     <Layout>
-      <Box sx={{ display: "flex", flexWrap: "wrap", justifyContent: "center" }}>
-        {MenuList.map((menu) => (
-          <Card sx={{ maxWidth: "390px", display: "flex", m: 2}} key={menu.id}>
-            <CardActionArea>
-              <CardMedia
-                sx={{ minHeight: "400px" }}
-                component={"img"}
-                src={menu.image}
-                alt={menu.name}
-              />
-              <CardContent sx={{ display: "flex", justifyContent: "space-between" }}>
-                <Typography variant="h5" component="div">
-                  {menu.name}
-                </Typography>
-                <Typography variant="h5">Price: ${menu.price}</Typography>
-              </CardContent>
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  marginBottom: "20px",
-                }}
-              >
-                <Button
-                  variant="contained"
-                  color="primary"
-                  sx={{ width: "180px", height: "50px", marginLeft: "10px", fontSize: "18px" }}
+      {data.map((cv, idx) => {
+        return (
+          <div
+            key={cv.id}
+            style={{ display: "inline-block", width: "30%", margin: "1%" }}
+          >
+            <Card key={cv.id}>
+              <CardActionArea>
+                <CardMedia
+                  sx={{ minHeight: "400px" }}
+                  component={"img"}
+                  src={cv.images[0]}
+                  alt={"image"}
+                />
+
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    marginBottom: "20px",
+                  }}
                 >
-                  <b>
-                    <TrendingUpIcon sx={{ marginRight: "10px", marginTop: "8px" }} />
-                  </b>{" "}
-                  Buy
-                </Button>
-              </Box>
-            </CardActionArea>
-          </Card>
-        ))}
-      </Box>
-      <Link to="/cart">
-        <Button variant="contained" color="primary" onClick={handleBuyClick} sx={{ width: "180px", height: "50px", fontSize: "18px", margin: "" }}>
-          <ShoppingCartIcon sx={{ marginRight: "10px", marginTop: "0px" }} />
-          View Cart
-        </Button>
-        {showDetails && <ProductDetails product={product} />}
-      </Link>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    sx={{
+                      width: "180px",
+                      height: "50px",
+                      marginLeft: "10px",
+                      fontSize: "18px",
+                    }}
+                    onClick={() => handleBuyClick(cv)}
+                  >
+                    Buy
+                  </Button>
+                </Box>
+              </CardActionArea>
+            </Card>
+          </div>
+        );
+      })}
+
+      {/* Product Modal */}
+      <Dialog
+        open={selectedProduct !== null}
+        onClose={handleCloseModal}
+      >
+        <DialogTitle>{selectedProduct?.name}</DialogTitle>
+        <DialogContent>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              marginBottom: "20px",
+            }}
+          >
+            <img
+              src={selectedProduct?.images[0]}
+              alt="Related product image"
+              style={{ width: "80%",height:'60%' }}
+            />
+          </Box>
+          <p>
+            <b>Product Name:</b> {selectedProduct?.title}
+          </p>
+          <br />
+          <p>
+            <b>Product Detail:</b> {selectedProduct?.description}
+          </p>
+          <br />
+          <p>
+            <b>Price:</b> {selectedProduct?.price}
+          </p>
+          <br />
+          <TextField
+            label="Quantity"
+            type="number"
+            variant="outlined"
+            value={quantity}
+            onChange={handleQuantityChange}
+          />
+
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginTop: "20px",
+            }}
+          >
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleCloseModal}
+              sx={{ marginLeft: "20px", width: '120px', height: '40px' }}
+            >
+              Close
+            </Button>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => {
+                if (quantity >= 1) {
+                  alert(
+                    `You are buying Item ${quantity} ${selectedProduct?.title}`
+                  );
+                  handleCloseModal();
+                } else {
+                  alert("Quantity must be at least 1.");
+                }
+              }}
+              sx={{ marginLeft: "20px", width: '120px', height: '40px' }}
+            >
+              Buy
+            </Button>
+          </Box>
+        </DialogContent>
+      </Dialog>
     </Layout>
   );
 };
